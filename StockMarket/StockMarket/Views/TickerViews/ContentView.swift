@@ -27,6 +27,11 @@ struct ContentView: View {
                 try? await model.fetchTickers()
                 dataLoaded = true
             }
+            .alert(model.errorMSG, isPresented: $model.showAlert) {
+                Button("OK"){
+                    print("OK")
+                }
+            }
         } detail: {
             Text("Select a Ticker")
         }

@@ -27,6 +27,11 @@ struct EodListView: View {
             try? await model.fetchTickerEods(symbol: symbol)
             dataLoaded = true
         }
+        .alert(model.errorMSG, isPresented: $model.showAlert) {
+            Button("OK"){
+                print("OK")
+            }
+        }
     }
 }
 

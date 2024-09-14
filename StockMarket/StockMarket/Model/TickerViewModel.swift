@@ -10,27 +10,33 @@ import Foundation
 @Observable
 class TickerViewModel : ViewModel{
     var tickers: [Ticker] = []
+    var errorMSG:String = ""
+    var showAlert = false
     
     func fetchTickers() async throws{
         let urlString = baseURL + version + "tickers"
         guard var urlComponents = URLComponents(string: urlString) else{
-            print("Invalid Tickers URL")
+            errorMSG = "Invalid Tickers URL"
+            showAlert = true
             return
         }
         
         urlComponents.queryItems = [URLQueryItem(name: "access_key", value: access_key)]
         guard let url = urlComponents.url else{
-            print("Invalid Compoments URl")
+            errorMSG = "Invalid Compoments URL"
+            showAlert = true
             return
         }
                 
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error{
-                print("Error while fetching Tickers, Error : \(error.localizedDescription)")
+                self.errorMSG = ("Error while fetching Tickers, Error : \(error.localizedDescription)")
+                self.showAlert = true
                 return
             }
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-                print("Response error")
+                self.errorMSG = "Response error"
+                self.showAlert = true
                 return
             }
             if let data = data{

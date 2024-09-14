@@ -11,10 +11,14 @@ import Foundation
 class EodViewModel: ViewModel{
     
     var eods: [Eod] = []
+    var errorMSG:String = ""
+    var showAlert = false
+    
     func fetchTickerEods(symbol:String) async throws{
         let urlString = baseURL + version + "eod"
         guard var urlComponents = URLComponents(string: urlString) else{
-            print("Invalid Tickers URL")
+            errorMSG = "Invalid EOD URL"
+            showAlert = true
             return
         }
         
@@ -23,17 +27,20 @@ class EodViewModel: ViewModel{
         
         urlComponents.queryItems = [urlQAccess, urlSymbol]
         guard let url = urlComponents.url else{
-            print("Invalid Compoments URl")
+            errorMSG = "Invalid Components URL"
+            showAlert = true
             return
         }
         
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error{
-                print("Error while fetching Tickers, Error : \(error.localizedDescription)")
+                self.errorMSG = ("Error while fetching EOD data, Error : \(error.localizedDescription)")
+                self.showAlert = true
                 return
             }
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-                print("Response error")
+                self.errorMSG = "Response error"
+                self.showAlert = true
                 return
             }
             if let data = data{
